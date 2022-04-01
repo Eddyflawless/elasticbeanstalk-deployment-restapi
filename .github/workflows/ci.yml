@@ -33,8 +33,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install npm dependencies 
-        run: |
-        cd src/ && npm install
+        run: cd src/ && npm install
 
       - name: Run unit-tests (PASSES)
         run: echo "running stud unit test...."  
