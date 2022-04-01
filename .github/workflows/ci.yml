@@ -34,7 +34,7 @@ jobs:
 
       - name: Install npm dependencies 
         run: |
-        cd src && npm install
+        cd src/ && npm install
 
       - name: Run unit-tests (PASSES)
         run: echo "running stud unit test...."  
