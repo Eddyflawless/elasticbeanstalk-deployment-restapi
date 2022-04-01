@@ -1,0 +1,64 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+
+env: 
+  PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
+  S3_BUCKET: ${{ secrets.S3_BUCKET }}
+  APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      
+      - uses: actions/checkout@v2
+
+      - name: Install npm dependencies 
+        run: |
+        cd src && npm install
+
+      - name: Run unit-tests (PASSES)
+        run: echo "running stud unit test...."  
+
+      - name: Create a zip package of the code in src
+        run: zip -r ${{ PACKAGE_NAME }} ./src
+
+      - name: Configure Aws Crendentials  
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.REGION }}
+
+      - name: Upload package to S3    
+        run:  aws s3 cp ${{ PACKAGE_NAME }} s3://${{ S3_BUCKET }}/
+
+      - name: Create new ElasticBeanstalk Application Version
+        run: | 
+        aws elasticbeanstalk create-application-version \
+          --application-name ${{APPLICATION_NAME}} \
+          --source-bundle S3Bucket="${{ S3_BUCKET }}",S3Key="${{ PACKAGE_NAME }}" \
+          --version-label "ver-${{ github.sha }}" \
+          --description "commit-sha-${{ github.sha }}"
+
+      - name: Deploy new ElasticBeanstalk Application Version
+        run: aws elasticbeanstalk update-environment --environment-name ${{APPLICATION_NAME}}-env-1 --version-label "ver-${{ github.sha }}"    
