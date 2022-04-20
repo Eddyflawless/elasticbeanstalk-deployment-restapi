@@ -40,7 +40,7 @@ jobs:
         run: echo "running stud unit test...."  
 
       - name: Create a zip package of the code in src
-        run: zip -r ${{ PACKAGE_NAME }} ./src
+        run: zip -r ${{ env.PACKAGE_NAME }} ./src
 
       - name: Configure Aws Crendentials  
         uses: aws-actions/configure-aws-credentials@v1
@@ -50,15 +50,17 @@ jobs:
           aws-region: ${{ secrets.REGION }}
 
       - name: Upload package to S3    
-        run:  aws s3 cp ${{ PACKAGE_NAME }} s3://${{ S3_BUCKET }}/
+        run:  | 
+          zip src.zip src
+          aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.S3_BUCKET }}/
 
       - name: Create new ElasticBeanstalk Application Version
         run: | 
           aws elasticbeanstalk create-application-version \
-            --application-name ${{APPLICATION_NAME}} \
-            --source-bundle S3Bucket="${{ S3_BUCKET }}",S3Key="${{ PACKAGE_NAME }}" \
+            --application-name ${{ env.APPLICATION_NAME}} \
+            --source-bundle S3Bucket="${{ env.S3_BUCKET }}",S3Key="${{ env.PACKAGE_NAME }}" \
             --version-label "ver-${{ github.sha }}" \
             --description "commit-sha-${{ github.sha }}"
 
       - name: Deploy new ElasticBeanstalk Application Version
-        run: aws elasticbeanstalk update-environment --environment-name ${{APPLICATION_NAME}}-env-1 --version-label "ver-${{ github.sha }}"    
+        run: aws elasticbeanstalk update-environment --environment-name ${{ env.APPLICATION_NAME }}-env-1 --version-label "ver-${{ github.sha }}"    
