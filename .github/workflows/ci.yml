@@ -46,7 +46,7 @@ jobs:
           ls -la
           echo $(pwd)
           ls -la ${{ env.PACKAGE_NAME }}.zip
-          aws s3 cp $(pwd)/${{ env.PACKAGE_NAME }}.zip s3://${{ env.S3_BUCKET }}/
+          aws s3 cp $(pwd)/${{ env.PACKAGE_NAME }}.zip s3://${{ env.S3_BUCKET }}/ 
 
       - name: Create new ElasticBeanstalk Application Version
         run: | 
