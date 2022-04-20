@@ -18,14 +18,16 @@ on:
   push:
     branches: [ master ]
 
-env: 
-  PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
-  S3_BUCKET: ${{ secrets.S3_BUCKET }}
-  APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
+
 
 
 jobs:
   deploy:
+    environment: dev
+    env: 
+      PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
+      S3_BUCKET: ${{ secrets.S3_BUCKET }}
+      APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
     runs-on: ubuntu-latest
     
     steps:
