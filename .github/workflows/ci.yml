@@ -45,6 +45,7 @@ jobs:
       - name: Upload package to S3    
         run:  |
           ls -la
+          echo $(pwd)
           aws s3 cp ./${{ env.PACKAGE_NAME }} s3://${{ env.S3_BUCKET }}/
 
       - name: Create new ElasticBeanstalk Application Version
