@@ -37,10 +37,10 @@ jobs:
           cd src/ && npm install
 
       - name: Run unit-tests (PASSES)
-        run: echo "running stud unit test...."  
+        run: echo "running stud unit test....package_name: ${env.PACKAGE_NAME}, access_id ${{ secrets.ACCESS_KEY_ID}}"  
 
       - name: Create a zip package of the code in src
-        run: zip -r ${{ env.PACKAGE_NAME }} ./src
+        run: zip -r ${{ env.PACKAGE_NAME }}.zip src
 
       - name: Configure Aws Crendentials  
         uses: aws-actions/configure-aws-credentials@v1
@@ -50,9 +50,7 @@ jobs:
           aws-region: ${{ secrets.REGION }}
 
       - name: Upload package to S3    
-        run:  | 
-          zip src.zip src
-          aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.S3_BUCKET }}/
+        run:  aws s3 cp ${{ env.PACKAGE_NAME }} s3://${{ env.S3_BUCKET }}/
 
       - name: Create new ElasticBeanstalk Application Version
         run: | 
