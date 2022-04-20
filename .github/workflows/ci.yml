@@ -37,7 +37,7 @@ jobs:
           cd src/ && npm install
 
       - name: Run unit-tests (PASSES)
-        run: echo "running stud unit test....package_name: ${env.PACKAGE_NAME}, access_id ${{ secrets.ACCESS_KEY_ID}}"  
+        run: echo "running stud unit test....package_name: ${env.PACKAGE_NAME}"  
 
       - name: Create a zip package of the code in src
         run: zip -r ${{ env.PACKAGE_NAME }}.zip src
